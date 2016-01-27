@@ -12,12 +12,9 @@ public class LightningEffect : MonoBehaviour {
     public Transform Source;
     public Transform Target;
 
-    IEnumerator Start () {
-	    while (true) {
-            for (int i = 0; i < NumberLightnings; i++) {
-                CreateLightning();
-            }
-            yield return null;
+    void Update() {
+        for (int i = 0; i < NumberLightnings; i++) {
+            CreateLightning();
         }
 	}
 
