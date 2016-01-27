@@ -24,15 +24,10 @@ public class Lightning : MonoBehaviour {
 
         float angle = GetAngle(sourcePosition, targetPosition) - 90;
 
-        Vector3 cross = Vector3.Cross(sourcePosition, targetPosition);
-        if (cross.z < 0) {
-            angle = 360 - angle;
-        }
-
         Vector3 startPoint = sourcePosition;
         for (int i = 1; i <= NumberSegments; i++) {
 
-            float y = (i * movePartiusLine);
+            float y = (i * movePartiusLine) + sourcePosition.y;
             float x = Random.Range(-MagnetudeRange, MagnetudeRange) + sourcePosition.x;
 
             Vector3 endPoint = new Vector3(x, y, sourcePosition.z);
