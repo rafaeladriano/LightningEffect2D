@@ -10,6 +10,7 @@ public class Lightning : MonoBehaviour {
     public float Tickeness;
     public Transform Source;
     public Transform Target;
+    public bool RandomSize;
 
     private List<LineLightning> lines;
 
@@ -20,7 +21,14 @@ public class Lightning : MonoBehaviour {
         Vector3 sourcePosition = Source.position;
         Vector3 targetPosition = Target.position;
 
-        float movePartiusLine = Vector3.Distance(targetPosition, sourcePosition) / NumberSegments;
+        float distance = Vector3.Distance(targetPosition, sourcePosition);
+
+        if (RandomSize) {
+            float min = distance * 0.25f;
+            distance = Random.Range(min, distance);
+        }
+
+        float movePartiusLine = distance / NumberSegments;
 
         float angle = GetAngle(sourcePosition, targetPosition) - 90;
 
