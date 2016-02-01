@@ -26,6 +26,7 @@ public class LightningEffect : MonoBehaviour {
         lightning.Tickeness = Tickeness;
         lightning.Source = Source;
         lightning.Target = Target;
+        lightning.transform.parent = transform;
     }
 	
 	
