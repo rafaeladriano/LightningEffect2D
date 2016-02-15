@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 public class LightningBolt : MonoBehaviour {
 
-    public Lightning lightningPrefab;
     public Color LightColor;
     public float MagnetudeRange;
     public int NumberSegments;
@@ -14,7 +13,9 @@ public class LightningBolt : MonoBehaviour {
     public bool RotationClockwise;
     public float RotationSpeed;
     public bool RandomSize;
+    public float CreateLightningDelay;
 
+    private float delay;
     private List<GameObject> seeds;
     private Vector3 rotationClockwiseValue;
 
@@ -36,25 +37,32 @@ public class LightningBolt : MonoBehaviour {
     }
 
     void Update() {
-
-        foreach (GameObject seed in seeds) {
-            seed.transform.RotateAround(transform.position, rotationClockwiseValue, Time.deltaTime * RotationSpeed);
-            for (int i = 0; i < NumberLightnings; i++) {
-                CreateLightning(seed);
+        delay -= Time.deltaTime;
+        if (delay < 0) {
+            foreach (GameObject seed in seeds) {
+                seed.transform.RotateAround(transform.position, rotationClockwiseValue, Time.deltaTime * RotationSpeed);
+                for (int i = 0; i < NumberLightnings; i++) {
+                    CreateLightning(seed);
+                }
             }
+            delay = CreateLightningDelay;
         }
     }
 
     private void CreateLightning(GameObject target) {
-        Lightning lightning = Instantiate(lightningPrefab);
-        lightning.LightColor = LightColor;
-        lightning.MagnetudeRange = MagnetudeRange;
-        lightning.NumberSegments = NumberSegments;
-        lightning.Tickeness = Tickeness;
-        lightning.RandomSize = RandomSize;
-        lightning.Source = transform;
-        lightning.Target = target.transform;
-        lightning.transform.parent = transform;
+        Lightning lightning = LightningPooler.Singleton.GetPooledObject();
+        if (lightning != null) {
+            lightning.LightColor = LightColor;
+            lightning.MagnetudeRange = MagnetudeRange;
+            lightning.NumberSegments = NumberSegments;
+            lightning.Tickeness = Tickeness;
+            lightning.RandomSize = RandomSize;
+            lightning.Source = transform;
+            lightning.Target = target.transform;
+            lightning.transform.parent = transform;
+            lightning.Show();
+            lightning.gameObject.SetActive(true);
+        }
     }
 
 }

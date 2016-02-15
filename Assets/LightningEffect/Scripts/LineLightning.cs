@@ -1,7 +1,11 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 
 public class LineLightning : MonoBehaviour {
 
+    public delegate void DeactivateLineLightning(LineLightning line);
+
+    public DeactivateLineLightning Callback;
     private SpriteRenderer lightSprite;
 
     void Start () {
@@ -10,7 +14,7 @@ public class LineLightning : MonoBehaviour {
 
     public void SetColor(Color color) {
         lightSprite = GetComponent<SpriteRenderer>();
-        lightSprite.color = color;
+        lightSprite.color = new Color(color.r, color.g, color.b, 1);
     }
 
     public void DrawLine(Vector2 A, Vector2 B, float tickeness) {
@@ -43,7 +47,11 @@ public class LineLightning : MonoBehaviour {
         lightSprite.color = new Color(lightSprite.color.r, lightSprite.color.g, lightSprite.color.b, lightSprite.color.a - (10f * Time.deltaTime));
 
         if (lightSprite.color.a <= 0f) {
-            Destroy(gameObject);
+            if (Callback != null) {
+                Callback(this);
+                Callback = null;
+            }
+            gameObject.SetActive(false);
         }
 
     }

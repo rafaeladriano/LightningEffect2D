@@ -1,9 +1,7 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class LightningEffect : MonoBehaviour {
 
-    public Lightning lightningPrefab;
     public Color LightColor;
     public float MagnetudeRange;
     public int NumberSegments;
@@ -11,22 +9,33 @@ public class LightningEffect : MonoBehaviour {
     public float Tickeness;
     public Transform Source;
     public Transform Target;
+    public float CreateLightningDelay;
+
+    private float delay;
 
     void Update() {
-        for (int i = 0; i < NumberLightnings; i++) {
-            CreateLightning();
+        delay -= Time.deltaTime;
+        if (delay < 0) {
+            for (int i = 0; i < NumberLightnings; i++) {
+                CreateLightning();
+            }
+            delay = CreateLightningDelay;
         }
 	}
 
     private void CreateLightning() {
-        Lightning lightning = Instantiate(lightningPrefab);
-        lightning.LightColor = LightColor;
-        lightning.MagnetudeRange = MagnetudeRange;
-        lightning.NumberSegments = NumberSegments;
-        lightning.Tickeness = Tickeness;
-        lightning.Source = Source;
-        lightning.Target = Target;
-        lightning.transform.parent = transform;
+        Lightning lightning = LightningPooler.Singleton.GetPooledObject();
+        if (lightning != null) {
+            lightning.transform.parent = transform;
+            lightning.Source = Source;
+            lightning.Target = Target;
+            lightning.LightColor = LightColor;
+            lightning.MagnetudeRange = MagnetudeRange;
+            lightning.NumberSegments = NumberSegments;
+            lightning.Tickeness = Tickeness;
+            lightning.Show();
+            lightning.gameObject.SetActive(true);
+        }
     }
 	
 	

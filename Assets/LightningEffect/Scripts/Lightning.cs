@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 public class Lightning : MonoBehaviour {
 
-    public LineLightning LineLightningPrefab;
     public Color LightColor;
     public float MagnetudeRange;
     public int NumberSegments;
@@ -14,10 +13,31 @@ public class Lightning : MonoBehaviour {
 
     private List<LineLightning> lines;
 
-    void Start() {
+    private bool create;
 
+    void Awake() {
         lines = new List<LineLightning>(NumberSegments);
+    }
 
+    public void Show() {
+        create = true;
+    }
+
+    void Update() {
+
+        if (create) {
+            CreateLightning();
+            create = false;
+        }
+
+        if (lines.Count == 0) {
+            gameObject.SetActive(false);
+        }
+
+    }
+
+    private void CreateLightning() {
+        
         Vector3 sourcePosition = Source.position;
         Vector3 targetPosition = Target.position;
 
@@ -40,12 +60,16 @@ public class Lightning : MonoBehaviour {
 
             Vector3 endPoint = new Vector3(x, y, sourcePosition.z);
 
-            LineLightning lineLightning = Instantiate(LineLightningPrefab);
-            lineLightning.transform.SetParent(transform);
-            lineLightning.DrawLine(startPoint, endPoint, Tickeness);
-            lineLightning.SetColor(LightColor);
+            LineLightning lineLightning = LineLightningPooler.Singleton.GetPooledObject();
+            if (lineLightning != null) {
+                lineLightning.transform.parent = transform;
+                lineLightning.SetColor(LightColor);
+                lineLightning.DrawLine(startPoint, endPoint, Tickeness);
+                lineLightning.Callback = RemoveLine;
+                lineLightning.gameObject.SetActive(true);
 
-            lines.Add(lineLightning);
+                lines.Add(lineLightning);
+            }
 
             startPoint = endPoint;
         }
@@ -53,21 +77,11 @@ public class Lightning : MonoBehaviour {
         transform.RotateAround(sourcePosition, Vector3.forward, angle);
     }
 
+    private void RemoveLine(LineLightning line) {
+        lines.Remove(line);
+    }
+
     private float GetAngle(Vector3 origin, Vector3 target) {
         return Mathf.Atan2(target.y - origin.y, target.x - origin.x) * Mathf.Rad2Deg;
     }
-
-    void Update() {
-
-        foreach (LineLightning line in lines) {
-            if (line) {
-                return;
-            }
-        }
-
-        Destroy(gameObject);
-
-    }
-
-
 }
